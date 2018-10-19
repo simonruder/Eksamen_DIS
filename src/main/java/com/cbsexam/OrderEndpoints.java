@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.Order;
 import utils.Encryption;
+import utils.Log;
 
 @Path("order")
 public class OrderEndpoints {
@@ -43,6 +44,9 @@ public class OrderEndpoints {
   @GET
   @Path("/")
   public Response getOrders() {
+
+    // Write to log that we are here
+    Log.writeLog(this.getClass().getName(), this, "Getting all orders", 0);
 
     // Call our controller-layer in order to get the order from the DB
     ArrayList<Order> orders = OrderController.getOrders();

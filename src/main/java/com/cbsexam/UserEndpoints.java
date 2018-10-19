@@ -46,7 +46,7 @@ public class UserEndpoints {
   public Response getUsers() {
 
     // Write to log that we are here
-    Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
+    Log.writeLog(this.getClass().getName(), this, "Getting all users", 0);
 
     // Get a list of users
     ArrayList<User> users = UserController.getUsers();

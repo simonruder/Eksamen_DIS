@@ -108,7 +108,7 @@ public class ProductController {
         Product product =
             new Product(
                 rs.getInt("id"),
-                rs.getString("name"),
+                rs.getString("product_name"),//den skal have samme navn som DB
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),

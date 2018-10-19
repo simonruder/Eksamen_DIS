@@ -76,7 +76,8 @@ public class OrderController {
       dbCon = new DatabaseController();
     }
 
-    String sql = "SELECT * FROM order";
+    String sql = "SELECT * FROM orders";
+    //Rettede de gamle SQL statement, så den kalder den rigtige table
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Order> orders = new ArrayList<Order>();
