@@ -120,7 +120,7 @@ public class UserController {
             + user.getEmail()
             + "', "
             + user.getCreatedTime()
-            + ");");
+            + ")");
 
     if (userID != 0) {
       //Update the userid of the user before returning

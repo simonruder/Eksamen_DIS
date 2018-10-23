@@ -20,6 +20,12 @@ public final class Config {
   private static String SOLR_PATH;
   private static String SOLR_CORE;
   private static long PRODUCT_TTL;
+  private static char EncryptedKey1;
+  private static char EncryptedKey2;
+  private static char EncryptedKey3;
+  private static char EncryptedKey4;
+  private static char EncryptedKey5;
+  private static char[] EncryptionKeyArray;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -65,6 +71,8 @@ public final class Config {
     return SOLR_CORE;
   }
 
+  public static char[] getEncryptionKeyArray(){return EncryptionKeyArray; }
+
   public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
@@ -99,5 +107,13 @@ public final class Config {
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+    EncryptedKey1 = json.get("EncryptKey1").getAsCharacter();
+    EncryptedKey2 = json.get("EncryptKey2").getAsCharacter();
+    EncryptedKey3 = json.get("EncryptKey3").getAsCharacter();
+    EncryptedKey4 = json.get("EncryptKey4").getAsCharacter();
+    EncryptedKey5 = json.get("EncryptKey5").getAsCharacter();
+
+    EncryptionKeyArray = new char[]{EncryptedKey1, EncryptedKey2, EncryptedKey3, EncryptedKey4, EncryptedKey5};
+
   }
 }
