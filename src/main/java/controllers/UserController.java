@@ -99,6 +99,7 @@ public class UserController {
     // Write in log that we've reach this step
     Log.writeLog(UserController.class.getName(), user, "Actually creating a user in DB", 0);
 
+    Hashing hashing = new Hashing();
     // Set creation time for user.
     user.setCreatedTime(System.currentTimeMillis() / 1000L);
 
@@ -115,7 +116,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + Hashing.md5(user.getPassword())//SIMON - Hashing af Password
+            + hashing.hashWithMd5(user.getPassword())//SIMON - Hashing og salter af Password
             + "', '"
             + user.getEmail()
             + "', "

@@ -8,13 +8,14 @@ public final class Encryption {
     if (Config.getEncryption()) {
 
       // The key is predefined and hidden in code
-      // TODO: Create a more complex code and store it somewhere better
+      // TODO: Create a more complex code and store it somewhere better: FIX
       char[] key = Config.getEncryptionKeyArray(); //Gemt i config filen med en anden kode.
 
       // Stringbuilder enables you to play around with strings and make useful stuff
       StringBuilder thisIsEncrypted = new StringBuilder();
 
-      // TODO: This is where the magic of XOR is happening. Are you able to explain what is going on?
+      // TODO: This is where the magic of XOR is happening. Are you able to explain what is going on? : FIX
+      //Bundet op på binære tal, hvor de lægges sammen, key og string har en binær værdi som lægges sammen
       for (int i = 0; i < rawString.length(); i++) {
         thisIsEncrypted.append((char) (rawString.charAt(i) ^ key[i % key.length]));
       }

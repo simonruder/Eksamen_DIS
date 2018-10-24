@@ -7,7 +7,9 @@ import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
 
-  // TODO: You should add a salt and make this secure
+  private String salt = Config.getSaltKey();
+
+  // TODO: You should add a salt and make this secure : FIX
   public static String md5(String rawString) {
     try {
 
@@ -29,7 +31,6 @@ public final class Hashing {
       return sb.toString();
 
     } catch (java.security.NoSuchAlgorithmException e) {
-
       //If somethings breaks
       System.out.println("Could not hash string");
     }
@@ -37,7 +38,7 @@ public final class Hashing {
     return null;
   }
 
-  // TODO: You should add a salt and make this secure
+  // TODO: You should add a salt and make this secure : FIX
   public static String sha(String rawString) {
     try {
       // We load the hashing algoritm we wish to use.
@@ -58,4 +59,42 @@ public final class Hashing {
 
     return rawString;
   }
+  /**
+   * Hash string with MD5 hashing
+   * @param str input string
+   * @return MD5 hash of string
+   */
+  public  String hashWithMd5(String str) {
+    return md5(str);
+  }
+
+  public  String hashWithsha(String str) {
+    return md5(str);
+  }
+
+  /**
+   * Hash string AND salt with MD5 hash
+   * @param str input string
+   * @return MD5 hashed of string
+   */
+
+  //SIMON - Denne metode tager en Salt-streng og tilføjer den til passwordet, og derefter hasher den det
+  public String md5WithSalt(String str){
+
+
+    String md5Salt = str + this.salt;
+
+
+    return hashWithMd5(md5Salt);
+  }
+
+  public String shaWithSalt(String str){
+
+
+    String shaSalt = str + this.salt;
+
+
+    return hashWithsha(shaSalt);
+  }
+
 }

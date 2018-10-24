@@ -26,6 +26,7 @@ public final class Config {
   private static char EncryptedKey4;
   private static char EncryptedKey5;
   private static char[] EncryptionKeyArray;
+  private static String SaltKey;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -73,6 +74,10 @@ public final class Config {
 
   public static char[] getEncryptionKeyArray(){return EncryptionKeyArray; }
 
+  public static String getSaltKey() {
+    return SaltKey;
+  }
+
   public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
@@ -112,6 +117,7 @@ public final class Config {
     EncryptedKey3 = json.get("EncryptKey3").getAsCharacter();
     EncryptedKey4 = json.get("EncryptKey4").getAsCharacter();
     EncryptedKey5 = json.get("EncryptKey5").getAsCharacter();
+    SaltKey = json.get("SaltKey").getAsString();
 
     EncryptionKeyArray = new char[]{EncryptedKey1, EncryptedKey2, EncryptedKey3, EncryptedKey4, EncryptedKey5};
 
