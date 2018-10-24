@@ -82,7 +82,7 @@ public final class Hashing {
   public String md5WithSalt(String str){
 
 
-    String md5Salt = str + this.salt;
+    String md5Salt = str + salt;
 
 
     return hashWithMd5(md5Salt);
@@ -91,7 +91,7 @@ public final class Hashing {
   public String shaWithSalt(String str){
 
 
-    String shaSalt = str + this.salt;
+    String shaSalt = str + salt;
 
 
     return hashWithsha(shaSalt);

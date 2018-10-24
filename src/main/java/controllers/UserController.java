@@ -116,7 +116,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + hashing.hashWithMd5(user.getPassword())//SIMON - Hashing og salter af Password
+            + hashing.md5WithSalt(user.getPassword())//SIMON - Hashing og salter af Password
             + "', '"
             + user.getEmail()
             + "', "
@@ -133,5 +133,22 @@ public class UserController {
 
     // Return user
     return user;
+  }
+    // SIMON - Fjerner en bruger fra MySQL Databasen, og gør det med et prepared Statement
+  public static void deleteUser (int id){
+
+      // Write in log that we've reach this step
+      Log.writeLog(UserController.class.getName(), id, "Deleting user with id: "+ id, 0);
+
+      // Check for connection to DB
+      if (dbCon == null) {
+          dbCon = new DatabaseController();
+      }
+
+      String sql = "DELETE FROM user where id=" + id;
+
+      dbCon.deleteUser(sql);
+
+
   }
 }
