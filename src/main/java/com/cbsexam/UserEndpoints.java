@@ -100,10 +100,10 @@ public class UserEndpoints {
   @Path("/delete/{delete}")
   public Response deleteUser(@PathParam("delete") int idToDelete) {
 
-    //Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
+    //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
     UserController.deleteUser(idToDelete);
 
-    //Skriver i loggen, hvilken bruger, der bliver slettet
+    //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
     Log.writeLog(UserController.class.getName(), idToDelete, "Sletter nu: "+ idToDelete, 0);
 
     if (idToDelete!=0) {
