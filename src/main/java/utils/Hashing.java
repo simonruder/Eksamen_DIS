@@ -69,7 +69,7 @@ public final class Hashing {
   }
 
   public  String hashWithsha(String str) {
-    return md5(str);
+    return sha(str);
   }
 
   /**
