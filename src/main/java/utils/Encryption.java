@@ -9,7 +9,12 @@ public final class Encryption {
 
       // The key is predefined and hidden in code
       // TODO: Create a more complex code and store it somewhere better: FIX
-      char[] key = Config.getEncryptionKeyArray(); //Gemt i config filen med en anden kode.
+     // char[] key = Config.getEncryptionKeyArray(); //Gemt i config filen med en anden kode.
+
+      //Laver en String med en Key i config.json, denne hentes ned
+      String encryptKey = Config.getEncryptKeyString();
+      //Konverterer Stringen til en Char-array, som kan bruges i XOR-krypteringen
+      char[] key = encryptKey.toCharArray();
 
       // Stringbuilder enables you to play around with strings and make useful stuff
       StringBuilder thisIsEncrypted = new StringBuilder();
@@ -18,7 +23,7 @@ public final class Encryption {
       //Bundet op på binære tal, hvor de lægges sammen, key og string har en binær værdi som lægges sammen
       for (int i = 0; i < rawString.length(); i++) {
         thisIsEncrypted.append((char) (rawString.charAt(i) ^ key[i % key.length]));
-      }
+      } //this is encrypted består af chars ^lægger de binære værdier sammen
 
       // We return the encrypted string
       return thisIsEncrypted.toString();

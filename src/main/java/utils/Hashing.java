@@ -10,6 +10,7 @@ public final class Hashing {
   private String salt = Config.getSaltKey();
 
   // TODO: You should add a salt and make this secure : FIX
+  // TODO: Tilføj en salt, så der bliver generet en random salt, og denne skal gemmes i DB, under en ny kolonne
   public static String md5(String rawString) {
     try {
 
