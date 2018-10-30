@@ -111,7 +111,7 @@ public class DatabaseController {
     return result;
   }
 
-  public void deleteUser(String sql){
+  public void voidToDB(String sql){
 
     //SIMON - Tjekker om der er forbindelse til DB ellers oprettes den.
     if (connection == null)
@@ -130,4 +130,6 @@ public class DatabaseController {
     }catch (SQLException e){
       System.out.println(e.getMessage());}
   }
+
+
 }

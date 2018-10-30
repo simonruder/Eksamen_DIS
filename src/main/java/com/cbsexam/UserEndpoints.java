@@ -116,9 +116,25 @@ public class UserEndpoints {
   @POST
   @Path("update/{update}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(String x) {
+  public Response updateUser(@PathParam("update") String body) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    // Read the json from body and transfer it to a user class
+    User updateUser = new Gson().fromJson(body, User.class);
+
+
+   UserController.updateUser(updateUser);
+
+    // Use the controller to add the user
+//    User updatedUser = UserController.updateUser(updateUser);
+
+    // Get the user back with the added ID and return it to the user
+    String json = new Gson().toJson(updateUser);
+
+    if (updateUser!=null){
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    }else {
+      return Response.status(400).entity("Could not update user").build();
+    }
+
   }
 }

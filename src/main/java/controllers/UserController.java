@@ -147,8 +147,25 @@ public class UserController {
 
       String sql = "DELETE FROM user where id=" + id;
 
-      dbCon.deleteUser(sql);
+      dbCon.voidToDB(sql);
+  } //End of delete user
 
+  public static void updateUser (User user){
+
+    // Write in log that we've reach this step
+    Log.writeLog(UserController.class.getName(), user, "Actually updating a user in DB", 0);
+
+// Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+String sql = "UPDATE user SET first_name = "+user.getFirstname()+
+        ",last_name="+user.getLastname()+
+        ",password="+user.getPassword()+
+        ", email="+user.getEmail() +"where id="+user.getId();
+
+    dbCon.voidToDB(sql);
 
   }
 }
