@@ -1,5 +1,6 @@
 package com.cbsexam;
 
+import cache.ProductCache;
 import com.google.gson.Gson;
 import controllers.ProductController;
 import java.util.ArrayList;
@@ -44,10 +45,13 @@ public class ProductEndpoints {
   @Path("/")
   public Response getProducts() {
 
+    //Getting the instance of ProductCache
+    ProductCache productCache = new ProductCache();
+
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
     // Call our controller-layer in order to get the order from the DB
-    ArrayList<Product> products = ProductController.getProducts();
+    ArrayList<Product> products = productCache.getProducts(true);//ForceUpdate er true, hvilket ikke giver mening med en Cahce
 
     // TODO: Add Encryption to JSON : FIX
     // We convert the java object to json with GSON library imported in Maven
