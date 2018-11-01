@@ -109,7 +109,7 @@ public class UserEndpoints {
     if (idToDelete!=0) {
       return Response.status(200).entity("User with id: " + idToDelete + " has been deleted").build();
     }else {
-    return Response.status(400).entity("Endpoint not implemented yet").build();}
+    return Response.status(400).entity("Failed to delete user").build();}
   }
 
   // TODO: Make the system able to update users : FIXED
