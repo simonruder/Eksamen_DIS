@@ -51,7 +51,7 @@ public class ProductEndpoints {
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
     // Call our controller-layer in order to get the order from the DB
-    ArrayList<Product> products = productCache.getProducts(true);//ForceUpdate er true, hvilket ikke giver mening med en Cahce
+    ArrayList<Product> products = productCache.getProducts(false);//Den skal kun opdatere, hvis den er tom
 
     // TODO: Add Encryption to JSON : FIX
     // We convert the java object to json with GSON library imported in Maven
@@ -69,11 +69,17 @@ public class ProductEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createProduct(String body) {
 
+    //Getting the instance of ProductCache
+    ProductCache productCache = new ProductCache();
+
     // Read the json from body and transfer it to a product class
     Product newProduct = new Gson().fromJson(body, Product.class);
 
     // Use the controller to add the user
     Product createdProduct = ProductController.createProduct(newProduct);
+
+    //SIMON - ForceUpdate sættes til true, hvilket betyder at kræver en opdatering af cachen
+    productCache.getProducts(true);
 
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createdProduct);
