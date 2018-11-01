@@ -40,13 +40,13 @@ public class ProductEndpoints {
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
   }
 
+  private static ProductCache productCache = new ProductCache();//SIMON - Vi laver en global instans
+
   /** @return Responses */
   @GET
   @Path("/")
   public Response getProducts() {
 
-    //Getting the instance of ProductCache
-    ProductCache productCache = new ProductCache();
 
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
