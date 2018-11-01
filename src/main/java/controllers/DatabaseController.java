@@ -120,10 +120,10 @@ public class DatabaseController {
     try{
 
         //SIMON - Laver et preparedstatement for at undgå SQL injections
-      PreparedStatement deleteUserStatement = connection.prepareStatement(sql);
+      PreparedStatement securedStatement = connection.prepareStatement(sql);
 
       //SIMON - Updaterer databasen efter jeg har fjernet en bruger
-      deleteUserStatement.executeUpdate();
+      securedStatement.executeUpdate();
 
 
 

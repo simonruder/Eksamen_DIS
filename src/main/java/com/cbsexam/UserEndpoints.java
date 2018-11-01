@@ -95,7 +95,7 @@ public class UserEndpoints {
     return Response.status(400).entity("Endpoint not implemented yet").build();
   }
 
-  // TODO: Make the system able to delete users : FIX
+  // TODO: Make the system able to delete users : FIXED
   @POST
   @Path("/delete/{delete}")
   public Response deleteUser(@PathParam("delete") int idToDelete) {
@@ -112,17 +112,19 @@ public class UserEndpoints {
     return Response.status(400).entity("Endpoint not implemented yet").build();}
   }
 
-  // TODO: Make the system able to update users
+  // TODO: Make the system able to update users : FIXED
   @POST
   @Path("update/{update}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(@PathParam("update") String body) {
+  public Response updateUser(@PathParam("update") int userIdToUpdate, String UserUpdatedData) {
 
     // Read the json from body and transfer it to a user class
-    User updateUser = new Gson().fromJson(body, User.class);
+    User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
 
 
-   UserController.updateUser(updateUser);
+    if (userIdToUpdate != 0) {
+        UserController.updateUser(userIdToUpdate, updateUser);
+    }
 
     // Use the controller to add the user
 //    User updatedUser = UserController.updateUser(updateUser);
@@ -131,7 +133,8 @@ public class UserEndpoints {
     String json = new Gson().toJson(updateUser);
 
     if (updateUser!=null){
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + userIdToUpdate +
+              " ").build();
     }else {
       return Response.status(400).entity("Could not update user").build();
     }

@@ -38,7 +38,9 @@ public class UserController {
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getString("password"),
-                rs.getString("email"));
+                rs.getString("email"),
+                    rs.getLong("created_at"));
+
 
         // return the create object
         return user;
@@ -81,7 +83,8 @@ public class UserController {
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getString("password"),
-                rs.getString("email"));
+                rs.getString("email"),
+                rs.getLong("created_at"));
 
         // Add element to list
         users.add(user);
@@ -150,20 +153,37 @@ public class UserController {
       dbCon.voidToDB(sql);
   } //End of delete user
 
-  public static void updateUser (User user){
+  public static void updateUser (int userIdToUpdate, User userUpdatedData){
 
     // Write in log that we've reach this step
-    Log.writeLog(UserController.class.getName(), user, "Actually updating a user in DB", 0);
+    Log.writeLog(UserController.class.getName(), userUpdatedData, "Actually updating a user in DB", 0);
+
+    User currentUser = getUser(userIdToUpdate); //Finder den bruger vi Id, der skal ændres og opretter et objekt af denne.
+
+    if (userUpdatedData.getFirstname()==null){
+      userUpdatedData.setFirstname(currentUser.getFirstname());
+    }
+    if (userUpdatedData.getLastname()==null){
+      userUpdatedData.setLastname(currentUser.getLastname());
+    }
+    if (userUpdatedData.getEmail()==null){
+      userUpdatedData.setEmail(currentUser.getEmail());
+    }
+    if (userUpdatedData.getPassword()==null){
+      userUpdatedData.setPassword(currentUser.getPassword());
+    }
+
+
 
 // Check for DB Connection
     if (dbCon == null) {
       dbCon = new DatabaseController();
     }
 
-String sql = "UPDATE user SET first_name = "+user.getFirstname()+
-        ",last_name="+user.getLastname()+
-        ",password="+user.getPassword()+
-        ", email="+user.getEmail() +"where id="+user.getId();
+String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'" +
+        ", last_name= '"+userUpdatedData.getLastname()+ "'" +
+        ", password= '"+userUpdatedData.getPassword()+ "'" +
+        ", email= '"+userUpdatedData.getEmail()+ "'" + " where id="+userIdToUpdate;
 
     dbCon.voidToDB(sql);
 
