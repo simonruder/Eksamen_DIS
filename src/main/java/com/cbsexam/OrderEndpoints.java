@@ -29,7 +29,7 @@ public class OrderEndpoints {
     // Call our controller-layer in order to get the order from the DB
     Order order = OrderController.getOrder(idOrder);
 
-    // TODO: Add Encryption to JSON : FIX
+    // TODO: Add Encryption to JSON : FIXED
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(order);
 
@@ -56,7 +56,7 @@ public class OrderEndpoints {
     //SIMON - Implementerer cache
     ArrayList<Order> orders = orderCache.getOrders(false); //SIMON - Den skal kun opdatere hvis den er tom
 
-    // TODO: Add Encryption to JSON : FIX
+    // TODO: Add Encryption to JSON : FIXED
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(orders);
 
