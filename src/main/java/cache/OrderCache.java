@@ -16,7 +16,6 @@ public class OrderCache {
     private ArrayList<Order> orders;
 
     //Tiden hvorlænge cachen lever
-
     private long ttl;
 
     //Bliver sat når cachen bliver aktiveret
@@ -28,9 +27,10 @@ public class OrderCache {
 
     public ArrayList<Order> getOrders(Boolean forceUpdate) {
 
-        if (forceUpdate || ((this.created + this.ttl)<= (System.currentTimeMillis()/1000L ))
+        if (forceUpdate || ((this.created + this.ttl)<= (System.currentTimeMillis()/1000L ))//SIMON - Vi skal kun ind i dette loop, hvis tiden er gået eller gvis vi har lavet en ny order via endpointet
             || this.orders==null){
 
+            //Hvis listen er tom, så henter vi ordrene fra OrderControlleren
             ArrayList<Order>orders = OrderController.getOrders();
 
             this.orders = orders;

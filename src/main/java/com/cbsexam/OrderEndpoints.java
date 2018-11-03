@@ -1,5 +1,6 @@
 package com.cbsexam;
 
+import cache.OrderCache;
 import com.google.gson.Gson;
 import controllers.OrderController;
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public class OrderEndpoints {
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
+  //Laver en global instance af orderCachen
+
+  public static OrderCache orderCache = new OrderCache();
   /** @return Responses */
   @GET
   @Path("/")
@@ -48,8 +52,9 @@ public class OrderEndpoints {
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all orders", 0);
 
-    // Call our controller-layer in order to get the order from the DB
-    ArrayList<Order> orders = OrderController.getOrders();
+    // SIMON Call our cache-layer in order to get the orders from the DB
+    //SIMON - Implementerer cache
+    ArrayList<Order> orders = orderCache.getOrders(false); //SIMON - Den skal kun opdatere hvis den er tom
 
     // TODO: Add Encryption to JSON : FIX
     // We convert the java object to json with GSON library imported in Maven

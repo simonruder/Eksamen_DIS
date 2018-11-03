@@ -50,6 +50,7 @@ public class ProductEndpoints {
 
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
+
     // Call our controller-layer in order to get the order from the DB
     ArrayList<Product> products = productCache.getProducts(false);//Den skal kun opdatere, hvis den er tom
 
