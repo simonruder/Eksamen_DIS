@@ -8,8 +8,8 @@ import utils.Config;
 //TODO: Build this cache and use it.:FIXED
 
 
-//SIMON TODO:Implementér den i koden
-//SIMON - Imspireret af ProductCache
+//SIMON TODO:Implementér den i koden:FIXED
+//SIMON - Indspireret af ProductCache
 public class OrderCache {
 
     //Laver en liste over orderer
