@@ -26,19 +26,24 @@ public class UserEndpoints {
   @Path("/{idUser}")
   public Response getUser(@PathParam("idUser") int idUser) {
 
-    // Use the ID to get the user from the controller.
-    User user = UserController.getUser(idUser);
+      try {
+          // Use the ID to get the user from the controller.
+          User user = UserController.getUser(idUser);
 
-    // TODO: Add Encryption to JSON : FIXED
-    // Convert the user object to json in order to return the object
-    String json = new Gson().toJson(user);
+          // TODO: Add Encryption to JSON : FIXED
+          // Convert the user object to json in order to return the object
+          String json = new Gson().toJson(user);
 
-    //Kryptering tilføjet
-    json = Encryption.encryptDecryptXOR(json);
+          //Kryptering tilføjet
+          json = Encryption.encryptDecryptXOR(json);
 
-    // Return the user with the status code 200
-    // TODO: What should happen if something breaks down?
-    return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+          // Return the user with the status code 200
+          // TODO: What should happen if something breaks down? : FIXED
+          //Hvis databasen går ned, så får man ikke en Internal Server fejl, men blot en fejlmeddelelse, hvorpå man kan arbejde videre
+          return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+      }catch (Exception e){
+          return Response.status(400).entity("The user does not exist").build();
+      }
   }
 
   //SIMON - Laver en global instance af UserCache
