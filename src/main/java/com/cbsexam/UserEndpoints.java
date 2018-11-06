@@ -132,8 +132,6 @@ public class UserEndpoints {
 
     if (userIdToUpdate != 0) {
         UserController.updateUser(userIdToUpdate, updateUser);
-        //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
-        userCache.getUsers(true);
     }
 
     // Use the controller to add the user
@@ -143,6 +141,8 @@ public class UserEndpoints {
     String json = new Gson().toJson(updateUser);
 
     if (updateUser!=null){
+        //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
+        userCache.getUsers(true);
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + userIdToUpdate +
               " ").build();
     }else {

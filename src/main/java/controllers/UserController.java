@@ -9,6 +9,8 @@ import utils.Log;
 
 public class UserController {
 
+  private static Hashing hashing = new Hashing();
+
   private static DatabaseController dbCon;
 
   public UserController() {
@@ -97,12 +99,13 @@ public class UserController {
     return users;
   }
 
+
   public static User createUser(User user) {
 
     // Write in log that we've reach this step
     Log.writeLog(UserController.class.getName(), user, "Actually creating a user in DB", 0);
 
-    Hashing hashing = new Hashing();
+
 
     // Set creation time for user.
     user.setCreatedTime(System.currentTimeMillis() / 1000L);
@@ -177,6 +180,7 @@ public class UserController {
     }
 
 
+   hashing.setSalt(String.valueOf(currentUser.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
 
 // Check for DB Connection
     if (dbCon == null) {
@@ -185,7 +189,7 @@ public class UserController {
 
 String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'" +
         ", last_name= '"+userUpdatedData.getLastname()+ "'" +
-        ", password= '"+userUpdatedData.getPassword()+ "'" +
+        ", password= '"+hashing.shaWithSalt(userUpdatedData.getPassword())+ "'" +
         ", email= '"+userUpdatedData.getEmail()+ "'" + " where id="+userIdToUpdate;
 
     dbCon.voidToDB(sql);
