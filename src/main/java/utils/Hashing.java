@@ -7,12 +7,16 @@ import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
 
-  private String salt = Config.getSaltKey();
+  private String salt;
 
-  //TODO: HVilken HASH skal jeg bruge?
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    //TODO: HVilken HASH skal jeg bruge?
 
   // TODO: You should add a salt and make this secure : FIXED
-  // TODO: Tilføj en salt, så der bliver generet en random salt eller created_at, og denne skal gemmes i DB, under en ny kolonne
+  // TODO: Bruge created_at som SALT :FIXED
   public static String md5(String rawString) {
     try {
 
@@ -71,7 +75,7 @@ public final class Hashing {
     return md5(str);
   }
 
-  public  String hashWithsha(String str) {
+  public  String hashWithSha(String str) {
     return sha(str);
   }
 
@@ -81,7 +85,7 @@ public final class Hashing {
    * @return MD5 hashed of string
    */
 
-  //SIMON - Denne metode tager en Salt-streng og tilføjer den til passwordet, og derefter hasher den det
+  //SIMON - Denne metode tager en Salt-streng og tilføjer den til passwordet, og derefter hasher den det ved at kalde hashWithMd5
   public String md5WithSalt(String str){
 
 
@@ -97,7 +101,7 @@ public final class Hashing {
     String shaSalt = str + salt;
 
 
-    return hashWithsha(shaSalt);
+    return hashWithSha(shaSalt);
   }
 
 }

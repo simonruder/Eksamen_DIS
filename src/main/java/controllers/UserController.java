@@ -103,6 +103,7 @@ public class UserController {
     Log.writeLog(UserController.class.getName(), user, "Actually creating a user in DB", 0);
 
     Hashing hashing = new Hashing();
+
     // Set creation time for user.
     user.setCreatedTime(System.currentTimeMillis() / 1000L);
 
@@ -111,16 +112,17 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
+    hashing.setSalt(String.valueOf(user.getCreatedTime()));
     // Insert the user in the DB
     // TODO: Hash the user password before saving it. : FIXED
-    //SIMON TODO:Tag stilling til hvilken Hash-funktion jeg vil bruge
+    //SIMON TODO:Tag stilling til hvilken Hash-funktion jeg vil bruge: FIXED - bruger Sha
     int userID = dbCon.insert(
         "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
             + user.getFirstname()
             + "', '"
             + user.getLastname()
             + "', '"
-            + hashing.md5WithSalt(user.getPassword())//SIMON - Hashing og salter af Password
+            + hashing.shaWithSalt(user.getPassword())//SIMON - Hashing og salter af Password
             + "', '"
             + user.getEmail()
             + "', "
@@ -159,7 +161,7 @@ public class UserController {
     // Write in log that we've reach this step
     Log.writeLog(UserController.class.getName(), userUpdatedData, "Actually updating a user in DB", 0);
 
-    User currentUser = getUser(userIdToUpdate); //Finder den bruger vi Id, der skal ændres og opretter et objekt af denne.
+    User currentUser = getUser(userIdToUpdate); //Finder den bruger med Id, der skal ændres og opretter et objekt af dennes oplysninger.
 
     if (userUpdatedData.getFirstname()==null){
       userUpdatedData.setFirstname(currentUser.getFirstname());

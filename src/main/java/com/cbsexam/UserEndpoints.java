@@ -43,6 +43,7 @@ public class UserEndpoints {
 
   //SIMON - Laver en global instance af UserCache
   public static UserCache userCache = new UserCache();
+
   /** @return Responses */
   @GET
   @Path("/")
@@ -75,6 +76,10 @@ public class UserEndpoints {
 
     // Use the controller to add the user
     User createUser = UserController.createUser(newUser);
+
+    //SIMON - Opdaterer cachen når der er blevet oprettet en bruger
+    userCache.getUsers(true);
+
 
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createUser);
@@ -127,10 +132,12 @@ public class UserEndpoints {
 
     if (userIdToUpdate != 0) {
         UserController.updateUser(userIdToUpdate, updateUser);
+        //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
+        userCache.getUsers(true);
     }
 
     // Use the controller to add the user
-//    User updatedUser = UserController.updateUser(updateUser);
+    // User updatedUser = UserController.updateUser(updateUser);
 
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(updateUser);
