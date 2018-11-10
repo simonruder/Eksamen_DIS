@@ -117,29 +117,39 @@ public class UserEndpoints {
 
 
 if (token!=null){
-    return Response.status(200).entity("You have now logged in with token: \n"+token).build();
+    return Response.status(200).entity("Hello, here is your session-token\n"+token +"\n Remember it when entering other endpoints").build();
 }else{
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();}
+    return Response.status(400).entity("User with e-mail: "+ userLogin.getEmail()+ " doesn't exist").build();}
   }
 
   // TODO: Make the system able to delete users : FIXED
   @POST
-  @Path("/delete/{delete}")
-  public Response deleteUser(@PathParam("delete") int idToDelete) {
+  @Path("/delete/{delete}/{token}")
+  public Response deleteUser(@PathParam("delete") int idToDelete,@PathParam("token") String token) {
 
-      
+      try {
+          if (token.equals(UserController.getUser(idToDelete).getToken())) {
 
-    //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
-    UserController.deleteUser(idToDelete);
+              //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
+              UserController.deleteUser(idToDelete);
 
-    //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
-    Log.writeLog(UserController.class.getName(), idToDelete, "Sletter nu: "+ idToDelete, 0);
+              //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
+              Log.writeLog(UserController.class.getName(), idToDelete, "Sletter nu: " + idToDelete, 0);
 
-    if (idToDelete!=0) {
-      return Response.status(200).entity("User with id: " + idToDelete + " has been deleted").build();
-    }else {
-    return Response.status(400).entity("Failed to delete user").build();}
+              if (idToDelete != 0) {
+                  return Response.status(200).entity("Your account with id: " + idToDelete + " has now been deleted. \n Thanks for using our service.").build();
+              } else {
+                  return Response.status(400).entity("Failed to delete user").build();
+              }
+          } else {
+              System.out.println("Der er noget galt");
+              return Response.status(400).entity("The token doesn't match our service").build();
+          }
+      }catch (Exception e){
+          System.out.println(e);
+          return Response.status(400).entity("Your are not allowed to delete other users").build();
+      }
   }
 
   // TODO: Make the system able to update users : FIXED

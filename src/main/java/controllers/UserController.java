@@ -152,7 +152,7 @@ public class UserController {
   public static void deleteUser (int id){
 
       // Write in log that we've reach this step
-      Log.writeLog(UserController.class.getName(), id, "Deleting user with id: "+ id, 0);
+      Log.writeLog(UserController.class.getName(), id, "UserController: Deleting user with id: "+ id, 0);
 
       // Check for connection to DB
       if (dbCon == null) {
@@ -206,10 +206,7 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
     ArrayList<User> allUsers = UserController.getUsers();//SIMON - Brug evt. cachen i stedet
 
 
-    System.out.println(System.currentTimeMillis()/1000L);//Giver tiden hvor der bliver logget ind, denne skal bruges til at sætte salt
-
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(System.currentTimeMillis());
+    System.out.println("Login:"+System.currentTimeMillis()/1000L);//Giver tiden hvor der bliver logget ind, denne skal bruges til at sætte salt
 
 
     for (User user : allUsers) {
