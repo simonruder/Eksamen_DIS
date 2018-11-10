@@ -3,6 +3,8 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -41,7 +43,8 @@ public class UserController {
                 rs.getString("last_name"),
                 rs.getString("password"),
                 rs.getString("email"),
-                    rs.getLong("created_at"));
+                    rs.getLong("created_at"),
+                    rs.getString("token"));
 
 
         // return the create object
@@ -86,8 +89,10 @@ public class UserController {
                 rs.getString("last_name"),
                 rs.getString("password"),
                 rs.getString("email"),
-                rs.getLong("created_at"));
+                rs.getLong("created_at"),
+                    rs.getString("token"));
 
+        user.setToken(null);//SIMON - Fjerner token fra udskriftet
         // Add element to list
         users.add(user);
       }
@@ -191,6 +196,59 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
         ", last_name= '"+userUpdatedData.getLastname()+ "'" +
         ", password= '"+hashing.shaWithSalt(userUpdatedData.getPassword())+ "'" +
         ", email= '"+userUpdatedData.getEmail()+ "'" + " where id="+userIdToUpdate;
+
+    dbCon.voidToDB(sql);
+
+  }
+
+  public static String login(User userLogin) {
+
+    ArrayList<User> allUsers = UserController.getUsers();//SIMON - Brug evt. cachen i stedet
+
+
+    System.out.println(System.currentTimeMillis()/1000L);//Giver tiden hvor der bliver logget ind, denne skal bruges til at sætte salt
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(System.currentTimeMillis());
+
+
+    for (User user : allUsers) {
+      if (user.getEmail().equals(userLogin.getEmail())){
+
+        //SIMON - Sætter saltet
+        hashing.setSalt(String.valueOf(user.getCreatedTime()));
+
+        String password = hashing.shaWithSalt(userLogin.getPassword());
+
+        if (password.equals(user.getPassword())){
+          //SIMON - Laver nu et token ud fra username, email og med salt Created_time
+
+          String token = user.getFirstname()+user.getLastname()+user.getEmail();
+          hashing.setSalt(String.valueOf(System.currentTimeMillis()/100L));//Bruger CurrentTime, så token ikke kan genskabes igen, eller overvåges af hackere
+
+          token = hashing.shaWithSalt(token);
+
+          updateToken(user.id,token);//SIMON - Smider token ind i databasen, så det kan findes på brugeren når denne skal lave ændringer
+
+          return token;
+
+        }
+      }
+    }
+    return null;
+  }
+
+  private static void updateToken (int id, String token){
+
+    // Write in log that we've reach this step
+    Log.writeLog(UserController.class.getName(), token, "Updating the token i DB", 0);
+
+    // Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    String sql = "UPDATE DisExam.user SET token = " +"'" + token +"'"+ " where id="+id;
 
     dbCon.voidToDB(sql);
 

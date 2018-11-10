@@ -3,6 +3,8 @@ package com.cbsexam;
 import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
+
+import java.security.PublicKey;
 import java.util.ArrayList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,10 +15,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.User;
 import utils.Encryption;
+import utils.Hashing;
 import utils.Log;
 
 @Path("user")
 public class UserEndpoints {
+
+    //SIMON - Laver en global instance af UserCache
+    private static UserCache userCache = new UserCache();
+
+    private static Hashing hashing = new Hashing();
 
   /**
    * @param idUser
@@ -46,8 +54,7 @@ public class UserEndpoints {
       }
   }
 
-  //SIMON - Laver en global instance af UserCache
-  public static UserCache userCache = new UserCache();
+
 
   /** @return Responses */
   @GET
@@ -102,16 +109,26 @@ public class UserEndpoints {
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(String login) {
 
+      User userLogin = new Gson().fromJson(login, User.class);
+
+      String token = UserController.login(userLogin);
+
+
+if (token!=null){
+    return Response.status(200).entity("You have now logged in with token: \n"+token).build();
+}else{
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    return Response.status(400).entity("Endpoint not implemented yet").build();}
   }
 
   // TODO: Make the system able to delete users : FIXED
   @POST
   @Path("/delete/{delete}")
   public Response deleteUser(@PathParam("delete") int idToDelete) {
+
+      
 
     //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
     UserController.deleteUser(idToDelete);
