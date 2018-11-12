@@ -128,48 +128,70 @@ public class OrderController {
     if (dbCon == null) {
       dbCon = new DatabaseController();
     }
+    try {
+      //SIMON - Sætter AutoCommut til false, hviket betyder, at man ikke committer sql-statementet, hv
+      DatabaseController.getConnection().setAutoCommit(false);
 
-    // Save addresses to database and save them back to initial order instance
-    order.setBillingAddress(AddressController.createAddress(order.getBillingAddress()));
-    order.setShippingAddress(AddressController.createAddress(order.getShippingAddress()));
+      // Save addresses to database and save them back to initial order instance
+      order.setBillingAddress(AddressController.createAddress(order.getBillingAddress()));
+      order.setShippingAddress(AddressController.createAddress(order.getShippingAddress()));
 
-    // Save the user to the database and save them back to initial order instance
-    order.setCustomer(UserController.createUser(order.getCustomer()));
+      // Save the user to the database and save them back to initial order instance
+      order.setCustomer(UserController.createUser(order.getCustomer()));
 
-    // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts.
+      // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts:FIXED
 
-    // Insert the product in the DB
-    int orderID = dbCon.insert(
-        "INSERT INTO orders(user_id, billing_address_id, shipping_address_id, order_total, created_at, updated_at) VALUES("
-            + order.getCustomer().getId()
-            + ", "
-            + order.getBillingAddress().getId()
-            + ", "
-            + order.getShippingAddress().getId()
-            + ", "
-            + order.calculateOrderTotal()
-            + ", "
-            + order.getCreatedAt()
-            + ", "
-            + order.getUpdatedAt()
-            + ")");
+      // Insert the product in the DB
+      int orderID = dbCon.insert(
+              "INSERT INTO orders(user_id, billing_address_id, shipping_address_id, order_total, created_at, updated_at) VALUES("
+                      + order.getCustomer().getId()
+                      + ", "
+                      + order.getBillingAddress().getId()
+                      + ", "
+                      + order.getShippingAddress().getId()
+                      + ", "
+                      + order.calculateOrderTotal()
+                      + ", "
+                      + order.getCreatedAt()
+                      + ", "
+                      + order.getUpdatedAt()
+                      + ")");
 
-    if (orderID != 0) {
-      //Update the productid of the product before returning
-      order.setId(orderID);
+      if (orderID != 0) {
+        //Update the productid of the product before returning
+        order.setId(orderID);
+      }
+
+      // Create an empty list in order to go trough items and then save them back with ID
+      ArrayList<LineItem> items = new ArrayList<LineItem>();
+
+      // Save line items to database
+      for (LineItem item : order.getLineItems()) {
+        item = LineItemController.createLineItem(item, order.getId());
+        items.add(item);
+
+        //SIMON - Committer manuelt ordren til Databasen, hvis input er rigtigt
+        DatabaseController.getConnection().commit();
+      }
+
+      order.setLineItems(items);
+    }catch (SQLException e){
+      try{
+        DatabaseController.getConnection().rollback(); //SIMON - Stopper connection til databasen
+      } catch (SQLException ex){
+        ex.printStackTrace();
+        Log.writeLog(OrderController.class.getName(), order, "Something went wrong. The order input wasn't correct", 0);
+      }
     }
 
-    // Create an empty list in order to go trough items and then save them back with ID
-    ArrayList<LineItem> items = new ArrayList<LineItem>();
-
-    // Save line items to database
-    for(LineItem item : order.getLineItems()){
-      item = LineItemController.createLineItem(item, order.getId());
-      items.add(item);
+    finally {
+      try{
+        //SIMON - Sætter AutoCommit til true, så vi i fremtiden kan committe SQL-statements automatisk, uden et manuelt commit
+        DatabaseController.getConnection().setAutoCommit(true);
+      }catch (SQLException e){
+        e.printStackTrace();
+      }
     }
-
-    order.setLineItems(items);
-
     // Return order
     return order;
   }

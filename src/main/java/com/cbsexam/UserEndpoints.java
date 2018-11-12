@@ -31,8 +31,8 @@ public class UserEndpoints {
    * @return Responses
    */
   @GET
-  @Path("/{idUser}")
-  public Response getUser(@PathParam("idUser") int idUser) {
+  @Path("/{idUser}/{token}")
+  public Response getUser(@PathParam("idUser") int idUser, @PathParam("token") String token) {
 
       try {
           if (idUser==UserController.getUser(idUser).id) {
@@ -45,6 +45,11 @@ public class UserEndpoints {
 
               //Kryptering tilføjet
               json = Encryption.encryptDecryptXOR(json);
+
+              if (token.equals(UserController.getUser(idUser).getToken())){
+                  //SIMON - Dekrypterer indholdet, hvis man er logget ind med det rigtige token
+                  json=Encryption.encryptDecryptXOR(json);
+              }
 
               // Return the user with the status code 200
               // TODO: What should happen if something breaks down? : FIXED
@@ -62,8 +67,8 @@ public class UserEndpoints {
 
   /** @return Responses */
   @GET
-  @Path("/")
-  public Response getUsers() {
+  @Path("/{token}")
+  public Response getUsers(@PathParam("token") String token) {
 
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all users", 0);
@@ -77,6 +82,14 @@ public class UserEndpoints {
 
     //Kryptering tilføjet
     json=Encryption.encryptDecryptXOR(json);
+
+    for (User user :  users){
+        if (user.getToken()!= null && user.getToken().equals(token)){
+
+            //SIMON - Dekrypterer, hvis man indtaster det rigtige token
+            json = Encryption.encryptDecryptXOR(json);
+        }
+    }
 
     // Return the users with the status code 200
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
@@ -151,7 +164,7 @@ if (token!=null){
               return Response.status(400).entity("The token doesn't match our service").build();
           }
       }catch (Exception e){
-          System.out.println(e);
+          System.out.println(e.getMessage());
           return Response.status(400).entity("Your are not allowed to delete other users").build();
       }
   }
