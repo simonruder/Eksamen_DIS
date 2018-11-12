@@ -92,7 +92,6 @@ public class UserController {
                 rs.getLong("created_at"),
                     rs.getString("token"));
 
-        user.setToken(null);//SIMON - Fjerner token fra udskriftet
         // Add element to list
         users.add(user);
       }

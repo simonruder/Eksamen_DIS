@@ -2,6 +2,7 @@ package com.cbsexam;
 
 import cache.UserCache;
 import com.google.gson.Gson;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import controllers.UserController;
 
 import java.security.PublicKey;
@@ -77,18 +78,25 @@ public class UserEndpoints {
     ArrayList<User> users = userCache.getUsers(false);
 
     // TODO: Add Encryption to JSON : FIXED
-    // Transfer users to json in order to return it to the user
-    String json = new Gson().toJson(users);
 
-    //Kryptering tilføjet
-    json=Encryption.encryptDecryptXOR(json);
+      //SIMON - Krypterer indholdet hvis token ikke findes.
+      Boolean check = true;
 
     for (User user :  users){
         if (user.getToken()!= null && user.getToken().equals(token)){
+            //SIMON - Sætter check til false, så json-strengen ikke bliver krypteret, hvis token findes.
+            check = false;
 
-            //SIMON - Dekrypterer, hvis man indtaster det rigtige token
-            json = Encryption.encryptDecryptXOR(json);
         }
+        //SIMON - Sætter token til nul, så de ikke bliver udskrevet
+        user.setToken(null);
+    }
+
+    // Transfer users to json in order to return it to the user
+    String json = new Gson().toJson(users);
+    if (check){
+        //SIMON - Tilføjer kryptering
+        json = Encryption.encryptDecryptXOR(json);
     }
 
     // Return the users with the status code 200
