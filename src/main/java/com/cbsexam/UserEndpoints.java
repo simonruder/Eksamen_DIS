@@ -158,32 +158,37 @@ if (token!=null){
 
   // TODO: Make the system able to update users : FIXED
   @POST
-  @Path("update/{update}")
+  @Path("update/{update}/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(@PathParam("update") int userIdToUpdate, String UserUpdatedData) {
+  public Response updateUser(@PathParam("update") int userIdToUpdate, String UserUpdatedData, @PathParam("token") String token) {
 
-    // Read the json from body and transfer it to a user class
-    User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
+     try {
 
 
-    if (userIdToUpdate != 0) {
-        UserController.updateUser(userIdToUpdate, updateUser);
-    }
+         // Read the json from body and transfer it to a user class
+         User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
 
-    // Use the controller to add the user
-    // User updatedUser = UserController.updateUser(updateUser);
+         if (token.equals(UserController.getUser(userIdToUpdate).getToken())) {
 
-    // Get the user back with the added ID and return it to the user
-    String json = new Gson().toJson(updateUser);
+             if (userIdToUpdate != 0) {
+                 UserController.updateUser(userIdToUpdate, updateUser);
+             }
+         }
 
-    if (updateUser!=null){
-        //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
-        userCache.getUsers(true);
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + userIdToUpdate +
-              " ").build();
-    }else {
-      return Response.status(400).entity("Could not update user").build();
-    }
+         // Get the user back with the added ID and return it to the user
+         String json = new Gson().toJson(updateUser);
 
-  }
+         if (updateUser != null) {
+             //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
+             userCache.getUsers(true);
+             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + userIdToUpdate ).build();
+         } else {
+             return Response.status(400).entity("Could not update user").build();
+         }
+
+     }catch (Exception e){
+         System.out.println(e.getMessage());
+         return Response.status(400).entity("The user doesn't exist").build();
+     }
+     }
 }
