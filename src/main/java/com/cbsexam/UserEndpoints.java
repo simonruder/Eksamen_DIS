@@ -142,7 +142,7 @@ public class UserEndpoints {
 
 
 if (token!=null){
-    return Response.status(200).entity("Hello, here is your session-token\n"+token +"\n Remember it when entering other endpoints").build();
+    return Response.status(200).entity("Hello, here is your session-token:\n"+token +"\n Remember it when entering other endpoints").build();
 }else{
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("User with e-mail: "+ userLogin.getEmail()+ " doesn't exist").build();}
