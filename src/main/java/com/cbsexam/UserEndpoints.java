@@ -37,29 +37,36 @@ public class UserEndpoints {
 
       try {
           if (idUser==UserController.getUser(idUser).id) {
+              boolean checkForEnctryption = true;
+
               // Use the ID to get the user from the controller.
               User user = UserController.getUser(idUser);
 
-              // TODO: Add Encryption to JSON : FIXED
+
               // Convert the user object to json in order to return the object
               String json = new Gson().toJson(user);
 
-              //Kryptering tilføjet
-              json = Encryption.encryptDecryptXOR(json);
+
 
               if (token.equals(UserController.getUser(idUser).getToken())){
                   //SIMON - Dekrypterer indholdet, hvis man er logget ind med det rigtige token
-                  json=Encryption.encryptDecryptXOR(json);
+                  checkForEnctryption = false;
+              }
+
+              if (checkForEnctryption){
+                  // TODO: Add Encryption to JSON : FIXED
+                  //Kryptering tilføjet
+                  json = Encryption.encryptDecryptXOR(json);
               }
 
               // Return the user with the status code 200
               // TODO: What should happen if something breaks down? : FIXED
-              //Hvis databasen går ned, så får man ikke en Internal Server fejl, men blot en fejlmeddelelse, hvorpå man kan arbejde videre
+              //SIMON - Hvis databasen går ned, så får man ikke en Internal Server fejl, men blot en fejlmeddelelse, hvorpå man kan arbejde videre
               return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
           }
       }
       catch (Exception e){
-          return Response.status(400).entity("The user does not exist").build();
+          return Response.status(400).entity("The token is not valid for the chosen userid").build();
       }
      return null;
   }
@@ -90,14 +97,18 @@ public class UserEndpoints {
 
         }
         //SIMON - Sætter token til nul, så de ikke bliver udskrevet
-        user.setToken(null);
+        //user.setToken(null); //TODO: Denne skal IKKE sættes til nul for ellers kan man ikke hente tokens efter første gang.
     }
 
     // Transfer users to json in order to return it to the user
     String json = new Gson().toJson(users);
+    //SIMON - Fjerner udskriften af tokens
+    json.replace("token","");
+
     if (check){
         //SIMON - Tilføjer kryptering
         json = Encryption.encryptDecryptXOR(json);
+
     }
 
     // Return the users with the status code 200
@@ -140,6 +151,8 @@ public class UserEndpoints {
       User userLogin = new Gson().fromJson(login, User.class);
 
       String token = UserController.login(userLogin);
+
+      userCache.getUsers(true);
 
 
 if (token!=null){
