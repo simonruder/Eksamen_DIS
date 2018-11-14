@@ -61,7 +61,7 @@ public class UserEndpoints {
       catch (Exception e){
           return Response.status(400).entity("The user does not exist").build();
       }
-      return null;
+     return null;
   }
 
 

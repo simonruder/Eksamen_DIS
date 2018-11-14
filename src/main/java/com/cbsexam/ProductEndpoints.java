@@ -11,58 +11,98 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import controllers.UserController;
 import model.Product;
+import model.User;
 import utils.Encryption;
 import utils.Log;
 
 @Path("product")
 public class ProductEndpoints {
 
+  private static ProductCache productCache = new ProductCache();//SIMON - Vi laver en global instans
+  private static ArrayList<User> users = UserController.getUsers();
+
   /**
    * @param idProduct
    * @return Responses
    */
   @GET
-  @Path("/{idProduct}")
-  public Response getProduct(@PathParam("idProduct") int idProduct) {
+  @Path("/{idProduct}/{token}")
+  public Response getProduct(@PathParam("idProduct") int idProduct, @PathParam("token") String token) {
 
+    try{
+
+
+    if (idProduct==ProductController.getProduct(idProduct).getId()){
+      boolean checkForEncryption = true;
     // Call our controller-layer in order to get the order from the DB
     Product product = ProductController.getProduct(idProduct);
 
-    // TODO: Add Encryption to JSON : FIXED
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(product);
 
-    //SIMON - Krypering tilføjet
-    json = Encryption.encryptDecryptXOR(json);
+    for (User user : users){
+      if (user.getToken()!=null && user.getToken().equals(token)){
+        checkForEncryption = false;
+      }
+    }
 
+    if (checkForEncryption){
+      // TODO: Add Encryption to JSON : FIXED
+      //SIMON - Krypering tilføjet
+      json = Encryption.encryptDecryptXOR(json);
+    }
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
+    }//End of IF ID=id
+
+    }catch (Exception e) {
+      System.out.println(e.getMessage());
+      return Response.status(400).entity("Product with "+idProduct+" does not exist").build();
+    }
+    return null;
   }
 
-  private static ProductCache productCache = new ProductCache();//SIMON - Vi laver en global instans
+
 
   /** @return Responses */
   @GET
-  @Path("/")
-  public Response getProducts() {
+  @Path("/{token}")
+  public Response getProducts(@PathParam("token") String token) {
+
+    try {
+      boolean checkForEncryption = true;
 
 
-    // Write to log that we are here
-    Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
+      // Write to log that we are here
+      Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
 
-    // Call our controller-layer in order to get the order from the DB
-    ArrayList<Product> products = productCache.getProducts(false);//Den skal kun opdatere, hvis den er tom
+      // Call our controller-layer in order to get the order from the DB
+      ArrayList<Product> products = productCache.getProducts(false);//Den skal kun opdatere, hvis den er tom
 
-    // TODO: Add Encryption to JSON : FIXED
-    // We convert the java object to json with GSON library imported in Maven
-    String json = new Gson().toJson(products);
 
-    //Kryptering tilføjet
-    json = Encryption.encryptDecryptXOR(json);
+      // We convert the java object to json with GSON library imported in Maven
+      String json = new Gson().toJson(products);
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
+      for (User user:users) {
+        if (user.getToken()!=null && user.getToken().equals(token)){
+          checkForEncryption=false;
+        }
+      }//SIMON - End of forEach
+
+      if (checkForEncryption){
+        // TODO: Add Encryption to JSON : FIXED
+        //Kryptering tilføjet
+        json = Encryption.encryptDecryptXOR(json);
+      }
+
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
+    }catch (Exception e){
+      return Response.status(400).entity("No products available").build();
+    }
   }
 
   @POST
