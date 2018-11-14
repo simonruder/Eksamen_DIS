@@ -11,60 +11,100 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import controllers.UserController;
 import model.Order;
+import model.User;
 import utils.Encryption;
 import utils.Log;
 
 @Path("order")
 public class OrderEndpoints {
 
+  private static ArrayList<User> users = UserController.getUsers();
+  //Laver en global instance af orderCachen
+  private static OrderCache orderCache = new OrderCache();
   /**
    * @param idOrder
    * @return Responses
    */
   @GET
-  @Path("/{idOrder}")
-  public Response getOrder(@PathParam("idOrder") int idOrder) {
+  @Path("/{idOrder}/{token}")
+  public Response getOrder(@PathParam("idOrder") int idOrder, @PathParam("token") String token) {
 
-    // Call our controller-layer in order to get the order from the DB
-    Order order = OrderController.getOrder(idOrder);
+    try {
+      if (idOrder==OrderController.getOrder(idOrder).getId()) {
 
-    // TODO: Add Encryption to JSON : FIXED
-    // We convert the java object to json with GSON library imported in Maven
-    String json = new Gson().toJson(order);
+        boolean checkForEncryption = true;
 
-    //SIMON - Tilføjer kryptering til getOrder
-    json = Encryption.encryptDecryptXOR(json);
+        // Call our controller-layer in order to get the order from the DB
+        Order order = OrderController.getOrder(idOrder);
 
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+        // We convert the java object to json with GSON library imported in Maven
+        String json = new Gson().toJson(order);
+
+        for (User user : users){
+          if (user.getToken()!= null && user.getToken().equals(token)){
+            checkForEncryption = false;
+          }
+        }
+
+        if (checkForEncryption){
+          // TODO: Add Encryption to JSON : FIXED
+          //SIMON - Tilføjer kryptering til getOrder
+          json = Encryption.encryptDecryptXOR(json);
+        }
+
+        // Return a response with status 200 and JSON as type
+        return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+      }
+    }catch (Exception e){
+      System.out.println(e.getMessage());
+      return Response.status(400).entity("The order with: "+idOrder+" does not exist").build();
+    }
+    return null;
   }
 
-  //Laver en global instance af orderCachen
 
-  public static OrderCache orderCache = new OrderCache();
   /** @return Responses */
   @GET
-  @Path("/")
-  public Response getOrders() {
+  @Path("/{token}")
+  public Response getOrders(@PathParam("token") String token) {
 
-    // Write to log that we are here
-    Log.writeLog(this.getClass().getName(), this, "Getting all orders", 0);
+    try {
 
-    // SIMON Call our cache-layer in order to get the orders from the DB
-    //SIMON - Implementerer cache
-    ArrayList<Order> orders = orderCache.getOrders(false); //SIMON - Den skal kun opdatere hvis den er tom
+      boolean checkForEncryption = true;
 
-    // TODO: Add Encryption to JSON : FIXED
-    // We convert the java object to json with GSON library imported in Maven
-    String json = new Gson().toJson(orders);
+      // Write to log that we are here
+      Log.writeLog(this.getClass().getName(), this, "Getting all orders", 0);
 
-    //SIMON - Kryptering er tilføjet
-    json=Encryption.encryptDecryptXOR(json);
+      // SIMON Call our cache-layer in order to get the orders from the DB
+      //SIMON - Implementerer cache
+      ArrayList<Order> orders = orderCache.getOrders(false); //SIMON - Den skal kun opdatere hvis den er tom
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
+
+      // We convert the java object to json with GSON library imported in Maven
+      String json = new Gson().toJson(orders);
+
+      for (User user : users){
+        if (user.getToken()!= null && user.getToken().equals(token)){
+          checkForEncryption = false;
+        }
+      }
+
+      if (checkForEncryption){
+        // TODO: Add Encryption to JSON : FIXED
+        //SIMON - Kryptering er tilføjet
+        json = Encryption.encryptDecryptXOR(json);
+      }
+
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
+    }catch (Exception e){
+      System.out.println(e.getMessage());
+      return Response.status(400).entity("No orders available").build();
+    }
   }
 
   @POST

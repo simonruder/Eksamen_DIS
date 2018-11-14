@@ -194,7 +194,7 @@ public class UserController {
 String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'" +
         ", last_name= '"+userUpdatedData.getLastname()+ "'" +
         ", password= '"+hashing.shaWithSalt(userUpdatedData.getPassword())+ "'" +
-        ", email= '"+userUpdatedData.getEmail()+ "'" + " where id="+userIdToUpdate;
+        ", email= '"+userUpdatedData.getEmail()+ "'" + "' where id="+userIdToUpdate;
 
     dbCon.voidToDB(sql);
 
@@ -202,7 +202,7 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
 
   public static String login(User userLogin) {
 
-    ArrayList<User> allUsers = UserController.getUsers();//SIMON - Brug evt. cachen i stedet
+    ArrayList<User> allUsers = getUsers();//SIMON - Brug evt. cachen i stedet
 
 
     System.out.println("Login:"+System.currentTimeMillis()/1000L);//Giver tiden hvor der bliver logget ind, denne skal bruges til at sætte salt
