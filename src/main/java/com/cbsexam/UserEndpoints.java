@@ -87,6 +87,7 @@ public class UserEndpoints {
             //SIMON - Sætter check til false, så json-strengen ikke bliver krypteret, hvis token findes.
             check = false;
 
+
         }
         //SIMON - Sætter token til nul, så de ikke bliver udskrevet
         user.setToken(null);
