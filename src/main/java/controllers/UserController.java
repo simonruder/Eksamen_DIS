@@ -163,28 +163,26 @@ public class UserController {
       dbCon.voidToDB(sql);
   } //End of delete user
 
-  public static void updateUser (int userIdToUpdate, User userUpdatedData){
+  public static void updateUser (User user, User userUpdatedData){
 
     // Write in log that we've reach this step
     Log.writeLog(UserController.class.getName(), userUpdatedData, "Actually updating a user in DB", 0);
 
-    User currentUser = getUser(userIdToUpdate); //Finder den bruger med Id, der skal ændres og opretter et objekt af dennes oplysninger.
-
     if (userUpdatedData.getFirstname()==null){
-      userUpdatedData.setFirstname(currentUser.getFirstname());
+      userUpdatedData.setFirstname(user.getFirstname());
     }
     if (userUpdatedData.getLastname()==null){
-      userUpdatedData.setLastname(currentUser.getLastname());
+      userUpdatedData.setLastname(user.getLastname());
     }
     if (userUpdatedData.getEmail()==null){
-      userUpdatedData.setEmail(currentUser.getEmail());
+      userUpdatedData.setEmail(user.getEmail());
     }
     if (userUpdatedData.getPassword()==null){
-      userUpdatedData.setPassword(currentUser.getPassword());
+      userUpdatedData.setPassword(user.getPassword());
     }
 
 
-   hashing.setSalt(String.valueOf(currentUser.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
+   hashing.setSalt(String.valueOf(user.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
 
 // Check for DB Connection
     if (dbCon == null) {
@@ -194,7 +192,7 @@ public class UserController {
 String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'" +
         ", last_name= '"+userUpdatedData.getLastname()+ "'" +
         ", password= '"+hashing.shaWithSalt(userUpdatedData.getPassword())+ "'" +
-        ", email= '"+userUpdatedData.getEmail()+ "'" + "' where id="+userIdToUpdate;
+        ", email= '"+userUpdatedData.getEmail()+ "'" + "' where id="+user.getId();
 
     dbCon.voidToDB(sql);
 
@@ -247,6 +245,23 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
     String sql = "UPDATE DisExam.user SET token = " +"'" + token +"'"+ " where id="+id;
 
     dbCon.voidToDB(sql);
+
+  }
+
+  public static void logout(User user) {
+
+    // Write in log that we've reach this step
+    Log.writeLog(UserController.class.getName(), user, "Logging out the user, and delete the token i DB", 0);
+
+    // Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    String sql = "Update DisExam.user set token = null where id="+ user.getId();
+
+    dbCon.voidToDB(sql);
+
 
   }
 }

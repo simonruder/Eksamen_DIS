@@ -28,47 +28,46 @@ public class UserEndpoints {
     private static Hashing hashing = new Hashing();
 
   /**
-   * @param idUser
+   * @param token
    * @return Responses
    */
   @GET
-  @Path("/{idUser}/{token}")
-  public Response getUser(@PathParam("idUser") int idUser, @PathParam("token") String token) {
+  @Path("/getuser/{token}")
+  public Response getUser(@PathParam("token") String token) {
+
+
 
       try {
-          if (idUser==UserController.getUser(idUser).id) {
-              boolean checkForEnctryption = true;
+          ArrayList<User> users = userCache.getUsers(false);
 
-              // Use the ID to get the user from the controller.
-              User user = UserController.getUser(idUser);
+          String json;
 
+          for (User user : users){
+              if (user.getToken()!=null && user.getToken().equals(token)){
+                  json = new Gson().toJson(user);
 
-              // Convert the user object to json in order to return the object
-              String json = new Gson().toJson(user);
+                  return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
 
-
-
-              if (token.equals(UserController.getUser(idUser).getToken())){
-                  //SIMON - Dekrypterer indholdet, hvis man er logget ind med det rigtige token
-                  checkForEnctryption = false;
               }
 
-              if (checkForEnctryption){
-                  // TODO: Add Encryption to JSON : FIXED
-                  //Kryptering tilføjet
-                  json = Encryption.encryptDecryptXOR(json);
-              }
+          }
+
+          json = new Gson().toJson(users);
+
+          // TODO: Add Encryption to JSON : FIXED
+          json = Encryption.encryptDecryptXOR(json);
+
+          return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
 
               // Return the user with the status code 200
               // TODO: What should happen if something breaks down? : FIXED
               //SIMON - Hvis databasen går ned, så får man ikke en Internal Server fejl, men blot en fejlmeddelelse, hvorpå man kan arbejde videre
-              return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-          }
+
+
       }
       catch (Exception e){
-          return Response.status(400).entity("The token is not valid for the chosen userid").build();
+          return Response.status(400).entity("No users available").build();
       }
-     return null;
   }
 
 
@@ -83,6 +82,7 @@ public class UserEndpoints {
 
     // Get a list of users from cache
     ArrayList<User> users = userCache.getUsers(false);
+    ArrayList<User>usersWithSelectedColumns = new ArrayList<>();
 
     // TODO: Add Encryption to JSON : FIXED
 
@@ -94,14 +94,16 @@ public class UserEndpoints {
             //SIMON - Sætter check til false, så json-strengen ikke bliver krypteret, hvis token findes.
             check = false;
 
+        }//SIMON - End of if-statement
 
-        }
-        //SIMON - Sætter token til nul, så de ikke bliver udskrevet
-        //user.setToken(null); //TODO: Denne skal IKKE sættes til nul for ellers kan man ikke hente tokens efter første gang.
+        //SIMON - Tilføjer brugere til den nye arrayliste med selecteret indhold
+        User userToArray = new User(user.getId(),user.getFirstname(),user.getLastname(),null,user.getEmail(),user.getCreatedTime(),null);
+        usersWithSelectedColumns.add(userToArray);
+
     }
 
-    // Transfer users to json in order to return it to the user
-    String json = new Gson().toJson(users);
+    // Transfer the selceted users to json in order to return it to the user
+    String json = new Gson().toJson(usersWithSelectedColumns);
     //SIMON - Fjerner udskriften af tokens
     json.replace("token","");
 
@@ -164,66 +166,80 @@ if (token!=null){
 
   // TODO: Make the system able to delete users : FIXED
   @POST
-  @Path("/delete/{delete}/{token}")
-  public Response deleteUser(@PathParam("delete") int idToDelete,@PathParam("token") String token) {
+  @Path("/delete/{token}")
+  public Response deleteUser(@PathParam("token") String token) {
 
-      try {
-          if (token.equals(UserController.getUser(idToDelete).getToken())) {
 
-              //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
-              UserController.deleteUser(idToDelete);
+          ArrayList<User> users = userCache.getUsers(false);
 
-              //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
-              Log.writeLog(UserController.class.getName(), idToDelete, "Sletter nu: " + idToDelete, 0);
+          for (User user : users){
+              if (user.getToken()!=null && user.getToken().equals(token)){
+                  //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
+                  UserController.deleteUser(user.getId());
+                  //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
+                  Log.writeLog(UserController.class.getName(), user.getId(), "Sletter nu: " + user.getId(), 0);
 
-              if (idToDelete != 0) {
-                  return Response.status(200).entity("Your account with id: " + idToDelete + " has now been deleted. \n Thanks for using our service.").build();
-              } else {
-                  return Response.status(400).entity("Failed to delete user").build();
+                  //SIMON - Updating the cache
+                  userCache.getUsers(true);
+                  return Response.status(200).entity("Your account with id: " + user.getId() + " has now been deleted. \n Thanks for using our service.").build();
               }
-          } else {
-              System.out.println("Der er noget galt");
-              return Response.status(400).entity("The token doesn't match our service").build();
           }
-      }catch (Exception e){
-          System.out.println(e.getMessage());
-          return Response.status(400).entity("Your are not allowed to delete other users").build();
-      }
+          return Response.status(400).entity("Your token is not valid").build();
+
   }
 
   // TODO: Make the system able to update users : FIXED
   @POST
-  @Path("update/{update}/{token}")
+  @Path("update/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(@PathParam("update") int userIdToUpdate, String UserUpdatedData, @PathParam("token") String token) {
+  public Response updateUser(String UserUpdatedData, @PathParam("token") String token) {
 
-     try {
+      ArrayList<User> users = userCache.getUsers(false);
+      // Read the json from body and transfer it to a user class
+      User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
+
+        for (User user : users){
+            if (user.getToken()!=null && user.getToken().equals(token)){
+
+            UserController.updateUser(user, updateUser);
+
+            //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
+            userCache.getUsers(true);
+            return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + user.getId() ).build();
+
+            }
+        }
+
+         return Response.status(400).entity("Invalid token").build();
+  }
 
 
-         // Read the json from body and transfer it to a user class
-         User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
+    @POST
+    @Path("/logout/{token}")
+    public Response logout (@PathParam("token") String token){
 
-         if (token.equals(UserController.getUser(userIdToUpdate).getToken())) {
+      ArrayList<User> users = userCache.getUsers(false);
 
-             if (userIdToUpdate != 0) {
-                 UserController.updateUser(userIdToUpdate, updateUser);
-             }
-         }
+      for (User user : users){
+          if (user.getToken()!= null && user.getToken().equals(token)){
+              UserController.logout(user);
 
-         // Get the user back with the added ID and return it to the user
-         String json = new Gson().toJson(updateUser);
+              userCache.getUsers(true);
 
-         if (updateUser != null) {
-             //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
-             userCache.getUsers(true);
-             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + userIdToUpdate ).build();
-         } else {
-             return Response.status(400).entity("Could not update user").build();
-         }
+              return Response.status(200).entity("You are now logget out. See Ya").build();
+          }
+      }
 
-     }catch (Exception e){
-         System.out.println(e.getMessage());
-         return Response.status(400).entity("The user doesn't exist").build();
-     }
-     }
+        return Response.status(400).entity("Invalid token").build();
+
+    }
+
+
+
+
+
+
+
 }
+
+

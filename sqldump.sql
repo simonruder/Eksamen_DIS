@@ -147,8 +147,10 @@ CREATE TABLE `user` (
   `password` varchar(255) COLLATE utf8_danish_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_danish_ci NOT NULL,
   `created_at` int(11) unsigned NOT NULL,
+  `token` varchar(100),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
