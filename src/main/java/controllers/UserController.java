@@ -63,7 +63,7 @@ public class UserController {
   /**
    * Get all users in database
    *
-   * @return
+   * @return users
    */
   public static ArrayList<User> getUsers() {
 
@@ -119,7 +119,7 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-    hashing.setSalt(String.valueOf(user.getCreatedTime()));
+    hashing.setSalt(String.valueOf(user.getCreatedTime()));//SIMON - Sætter salt til at være CreatedTime
     // Insert the user in the DB
     // TODO: Hash the user password before saving it. : FIXED
     //SIMON TODO:Tag stilling til hvilken Hash-funktion jeg vil bruge: FIXED - bruger Sha
@@ -129,7 +129,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + hashing.shaWithSalt(user.getPassword())//SIMON - Hashing og salter af Password
+            + hashing.shaWithSalt(user.getPassword())//SIMON - Hashing og salter(created_at) af Password
             + "', '"
             + user.getEmail()
             + "', "
@@ -218,7 +218,7 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
           //SIMON - Laver nu et token ud fra username, email og med salt Created_time
 
           String token = user.getFirstname()+user.getLastname()+user.getEmail();
-          hashing.setSalt(String.valueOf(System.currentTimeMillis()/100L));//Bruger CurrentTime, så token ikke kan genskabes igen, eller overvåges af hackere
+          hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));//Bruger CurrentTime, så token ikke kan genskabes igen, eller overvåges af hackere
 
           token = hashing.shaWithSalt(token);
 

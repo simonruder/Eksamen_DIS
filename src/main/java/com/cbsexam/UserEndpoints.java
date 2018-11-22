@@ -104,8 +104,7 @@ public class UserEndpoints {
 
     // Transfer the selceted users to json in order to return it to the user
     String json = new Gson().toJson(usersWithSelectedColumns);
-    //SIMON - Fjerner udskriften af tokens
-    json.replace("token","");
+
 
     if (check){
         //SIMON - Tilføjer kryptering
@@ -154,11 +153,11 @@ public class UserEndpoints {
 
       String token = UserController.login(userLogin);
 
-      userCache.getUsers(true);
+      userCache.getUsers(true); //SIMON - Opdaterer Cachen, så vi får token med, da vi verificerer ud fra Cahcen
 
 
 if (token!=null){
-    return Response.status(200).entity("Hello, here is your session-token:\n"+token +"\n Remember it when entering other endpoints").build();
+    return Response.status(200).entity("Hello, here is your session-token:\n"+token +"\n Remember it, when entering other endpoints").build();
 }else{
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("User with e-mail: "+ userLogin.getEmail()+ " doesn't exist").build();}
