@@ -121,29 +121,34 @@ public class UserEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createUser(String body) {
 
-    // Read the json from body and transfer it to a user class
-    User newUser = new Gson().fromJson(body, User.class);
+      try {
+          // Read the json from body and transfer it to a user class
+          User newUser = new Gson().fromJson(body, User.class);
 
-    // Use the controller to add the user
-    User createUser = UserController.createUser(newUser);
+          // Use the controller to add the user
+          User createUser = UserController.createUser(newUser);
 
-    //SIMON - Opdaterer cachen når der er blevet oprettet en bruger
-    userCache.getUsers(true);
+          //SIMON - Opdaterer cachen når der er blevet oprettet en bruger
+          userCache.getUsers(true);
 
 
-    // Get the user back with the added ID and return it to the user
-    String json = new Gson().toJson(createUser);
+          // Get the user back with the added ID and return it to the user
+          String json = new Gson().toJson(createUser);
 
-    // Return the data to the user
-    if (createUser != null) {
-      // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-    } else {
-      return Response.status(400).entity("Could not create user").build();
-    }
+          // Return the data to the user
+          if (createUser != null) {
+              // Return a response with status 200 and JSON as type
+              return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+          } else {
+              return Response.status(400).entity("Could not create user").build();
+          }
+      }catch (Exception e){
+          System.out.println(e.getMessage());
+          return Response.status(400).entity("E-mail address is already in use").build();
+      }
   }
 
-  // TODO: Make the system able to login users and assign them a token to use throughout the system.
+  // TODO: Make the system able to login users and assign them a token to use throughout the system : FIXED.
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -213,6 +218,7 @@ if (token!=null){
   }
 
 
+  //SIMON - Tillader brugeren at logge ud, og dermed nulstille sit token
     @POST
     @Path("/logout/{token}")
     public Response logout (@PathParam("token") String token){

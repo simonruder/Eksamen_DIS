@@ -129,7 +129,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + hashing.shaWithSalt(user.getPassword())//SIMON - Hashing og salter(created_at) af Password
+            + hashing.shaWithSalt(user.getPassword())//SIMON - Hashing og salter(med created_at) af Password
             + "', '"
             + user.getEmail()
             + "', "
