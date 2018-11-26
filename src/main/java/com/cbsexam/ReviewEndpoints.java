@@ -25,6 +25,8 @@ public class ReviewEndpoints {
   public Response search(@PathParam("title") String reviewTitle, @PathParam("token") String token) {
 
     try{
+
+      boolean checkForEncryption = true;
     //SIMON - Kalder UserControlleren til at lave en liste over alle brugere fra DB
     ArrayList<User> users = UserController.getUsers();
       // Call our controller-layer in order to get the order from the DB
@@ -37,13 +39,16 @@ public class ReviewEndpoints {
       //SIMON - Itererer gennem listen af brugere for at finde det token i DB, der matcher det indtastede
       for (User user : users) {
         if (user.getToken()!= null && user.getToken().equals(token)){
-      // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+            checkForEncryption = false;
         }
     }
-    // TODO: Add Encryption to JSON : FIXED
-    //SIMON - Kryptering tilføjet
-    json = Encryption.encryptDecryptXOR(json);
+
+    if (checkForEncryption) {
+      // TODO: Add Encryption to JSON : FIXED
+      //SIMON - Kryptering tilføjet
+      json = Encryption.encryptDecryptXOR(json);
+    }
+    
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
     }catch (Exception e){
       System.out.println(e.getMessage());
