@@ -51,6 +51,7 @@ public class OrderController {
                 rs.getString("token")
         );
         user.setToken(null);
+        user.setPassword(null);
 
         Address billingAddress = new Address(
                 rs.getInt("billing_address_id"),

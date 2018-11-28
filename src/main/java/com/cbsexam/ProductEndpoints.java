@@ -34,11 +34,12 @@ public class ProductEndpoints {
 
     try{
 
+      //SIMON - Vi behøver ikke tjekke for ID, da catchen fanger fejlen, hvis ID er udgyldigt
+      // Call our controller-layer in order to get the order from the DB
+      Product product = ProductController.getProduct(idProduct);
 
-    if (idProduct==ProductController.getProduct(idProduct).getId()){
       boolean checkForEncryption = true;
-    // Call our controller-layer in order to get the order from the DB
-    Product product = ProductController.getProduct(idProduct);
+
 
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(product);
@@ -56,13 +57,13 @@ public class ProductEndpoints {
     }
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
-    }//End of IF ID=id
+
 
     }catch (Exception e) {
       System.out.println(e.getMessage());
       return Response.status(400).entity("Product with "+idProduct+" does not exist").build();
     }
-    return null;
+
   }
 
 
@@ -79,7 +80,7 @@ public class ProductEndpoints {
       // Write to log that we are here
       Log.writeLog(this.getClass().getName(), this, "Getting all products", 0);
 
-      // Call our controller-layer in order to get the order from the DB
+      // Call our cache-layer in order to get the order from the cache
       ArrayList<Product> products = productCache.getProducts(false);//Den skal kun opdatere, hvis den er tom
 
 
