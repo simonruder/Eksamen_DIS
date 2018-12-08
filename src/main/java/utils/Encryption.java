@@ -23,7 +23,7 @@ public final class Encryption {
       //Bundet op på binære tal, hvor de lægges sammen via , key og string har en b^inær værdi som lægges sammen
       for (int i = 0; i < rawString.length(); i++) {
         thisIsEncrypted.append((char) (rawString.charAt(i) ^ key[i % key.length]));
-      } //this is encrypted består af chars ^lægger de binære værdier sammen
+      }//this is encrypted består af chars ^lægger de binære værdier sammen
 
       // We return the encrypted string
       return thisIsEncrypted.toString();

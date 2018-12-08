@@ -16,6 +16,15 @@ import utils.Encryption;
 @Path("search")
 public class ReviewEndpoints {
 
+
+    @GET
+    @Path("")
+    public Response standard(){
+        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You have to use your token to enter the other endpoints. " +
+                "\n You have to use the following url: IP:8080/search/title/{title}/{token}" +
+                "\n You can get your token at: IP:8080/user/login").build();
+    }
+
   /**
    * @param reviewTitle
    * @return Responses

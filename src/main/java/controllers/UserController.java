@@ -179,10 +179,16 @@ public class UserController {
     }
     if (userUpdatedData.getPassword()==null){
       userUpdatedData.setPassword(user.getPassword());
+    }else {//Denne metode hasher det nye password, hvis dette bliver ændret
+      hashing.setSalt(String.valueOf(user.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
+      userUpdatedData.setPassword(hashing.shaWithSalt(userUpdatedData.getPassword()));
+    }
+    if (userUpdatedData.getCreatedTime()==0){
+      userUpdatedData.setCreatedTime(user.getCreatedTime());
     }
 
 
-   hashing.setSalt(String.valueOf(user.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
+   //hashing.setSalt(String.valueOf(user.getCreatedTime()));//SIMON - Setter salt ud fra CurrentUsers Created_time
 
 // Check for DB Connection
     if (dbCon == null) {
@@ -191,8 +197,8 @@ public class UserController {
 
 String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'" +
         ", last_name= '"+userUpdatedData.getLastname()+ "'" +
-        ", password= '"+hashing.shaWithSalt(userUpdatedData.getPassword())+ "'" +
-        ", email= '"+userUpdatedData.getEmail()+ "'" + "' where id="+user.getId();
+        ", password= '"+userUpdatedData.getPassword()+ "'" +
+        ", email= '"+userUpdatedData.getEmail() + "' where id="+user.getId();
 
     dbCon.voidToDB(sql);
 
@@ -215,7 +221,7 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
         String password = hashing.shaWithSalt(userLogin.getPassword());
 
         if (password.equals(user.getPassword())){
-          //SIMON - Laver nu et token ud fra username, email og med salt Created_time
+          //SIMON - Laver nu et token ud fra username, lastname, email og med salt Current_time
 
           String token = user.getFirstname()+user.getLastname()+user.getEmail();
           hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));//Bruger CurrentTime, så token ikke kan genskabes igen, eller overvåges af hackere

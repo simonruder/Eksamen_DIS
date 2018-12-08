@@ -24,6 +24,16 @@ public class OrderEndpoints {
   private static ArrayList<User> users = UserController.getUsers();
   //Laver en global instance af orderCachen
   private static OrderCache orderCache = new OrderCache();
+
+
+  @GET
+  @Path("")
+  public Response standard(){
+    return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You have to use your token to enter the other endpoints. " +
+            "\n You can get your token at: IP:8080/user/login").build();
+  }
+
+
   /**
    * @param idOrder
    * @return Responses
@@ -129,7 +139,7 @@ public class OrderEndpoints {
     } else {
 
       // Return a response with status 400 and a message in text
-      return Response.status(400).entity("Could not create user").build();
+      return Response.status(400).entity("Could not create order").build();
     }
   }
 }

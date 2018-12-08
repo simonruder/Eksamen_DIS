@@ -190,7 +190,7 @@ public class OrderController {
       dbCon = new DatabaseController();
     }
     try {
-      //SIMON - Sætter AutoCommut til false, hviket betyder, at man ikke committer sql-statementet, hv
+      //SIMON - Sætter AutoCommut til false, hviket betyder, at man ikke committer sql-statementet, hvis der er fejl i input
       DatabaseController.getConnection().setAutoCommit(false);
 
       // Save addresses to database and save them back to initial order instance

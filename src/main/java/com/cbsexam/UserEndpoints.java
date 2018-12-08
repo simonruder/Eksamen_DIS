@@ -14,6 +14,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import jdk.nashorn.internal.objects.annotations.Getter;
 import model.User;
 import utils.Encryption;
 import utils.Hashing;
@@ -26,6 +28,15 @@ public class UserEndpoints {
     private static UserCache userCache = new UserCache();
 
     private static Hashing hashing = new Hashing();
+
+
+    @GET
+    @Path("")
+    public Response standard(){
+        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You have to use your token to enter the other endpoints." +
+                "\n You can get your token at: IP:8080/user/login").build();
+    }
+
 
   /**
    * @param token
@@ -164,7 +175,7 @@ public class UserEndpoints {
 if (token!=null){
     return Response.status(200).entity("Hello, here is your session-token:\n"+token +"\n Remember it, when entering other endpoints").build();
 }else{
-    // Return a response with status 200 and JSON as type
+    // Return a response with status 400 and JSON as type
     return Response.status(400).entity("User with e-mail: "+ userLogin.getEmail()+ " doesn't exist").build();}
   }
 
@@ -178,14 +189,15 @@ if (token!=null){
 
           for (User user : users){
               if (user.getToken()!=null && user.getToken().equals(token)){
-                  //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der bliver skrevet i URL'en
+                  //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der er blevet fundet i dette loop
                   UserController.deleteUser(user.getId());
                   //SIMON - Skriver i loggen, hvilken bruger, der bliver slettet
                   Log.writeLog(UserController.class.getName(), user.getId(), "Sletter nu: " + user.getId(), 0);
 
                   //SIMON - Updating the cache
                   userCache.getUsers(true);
-                  return Response.status(200).entity("Your account with id: " + user.getId() + " has now been deleted. \n Thanks for using our service.").build();
+                  return Response.status(200).entity("Your account with id: " + user.getId() + " has now been deleted. " +
+                          "\n Thanks for using our service.").build();
               }
           }
           return Response.status(400).entity("Your token is not valid").build();
