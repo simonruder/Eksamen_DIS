@@ -45,9 +45,7 @@ public class UserEndpoints {
   @GET
   @Path("/getuser/{token}")
   public Response getUser(@PathParam("token") String token) {
-
-
-
+//Metode 1 til kryptering
       try {
           ArrayList<User> users = userCache.getUsers(false);
 
@@ -58,17 +56,16 @@ public class UserEndpoints {
                   json = new Gson().toJson(user);
 
                   return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-
-              }
-
+              }//END of IF
           }
 
           json = new Gson().toJson(users);
 
+          //Tilføjer kryptering, hvis token er forkert
           // TODO: Add Encryption to JSON : FIXED
           json = Encryption.encryptDecryptXOR(json);
 
-          return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+          return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
 
               // Return the user with the status code 200
               // TODO: What should happen if something breaks down? : FIXED
@@ -87,8 +84,9 @@ public class UserEndpoints {
   @GET
   @Path("/{token}")
   public Response getUsers(@PathParam("token") String token) {
+      // Metode 2 til Kryptering
 
-    // Write to log that we are here
+      // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Getting all users", 0);
 
     // Get a list of users from cache
