@@ -119,7 +119,7 @@ public class OrderController {
     try {
       while(rs.next()) {
 
-        // TODO: Perhaps we could optimize things a bit here and get rid of nested queries.
+        // TODO: Perhaps we could optimize things a bit here and get rid of nested queries. : FIXED by SQL-statement
 
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
 
