@@ -232,6 +232,7 @@ String sql = "UPDATE user SET first_name = '"+userUpdatedData.getFirstname()+ "'
 
           return token;
 
+
         }
       }
     }

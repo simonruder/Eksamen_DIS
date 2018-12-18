@@ -29,6 +29,11 @@ public class UserEndpoints {
 
     private static Hashing hashing = new Hashing();
 
+    private static ArrayList<User> cashedUsers = userCache.getUsers(false);
+
+    public static ArrayList<User> getCashedUsers() {
+        return cashedUsers;
+    }
 
     @GET
     @Path("")
@@ -47,11 +52,11 @@ public class UserEndpoints {
   public Response getUser(@PathParam("token") String token) {
 //Metode 1 til kryptering
       try {
-          ArrayList<User> users = userCache.getUsers(false);
+
 
           String json;
 
-          for (User user : users){
+          for (User user : cashedUsers){
               if (user.getToken()!=null && user.getToken().equals(token)){
                   json = new Gson().toJson(user);
 
@@ -59,7 +64,7 @@ public class UserEndpoints {
               }//END of IF
           }
 
-          json = new Gson().toJson(users);
+          json = new Gson().toJson(cashedUsers);
 
           //Tilføjer kryptering, hvis token er forkert
           // TODO: Add Encryption to JSON : FIXED
@@ -90,7 +95,7 @@ public class UserEndpoints {
     Log.writeLog(this.getClass().getName(), this, "Getting all users", 0);
 
     // Get a list of users from cache
-    ArrayList<User> users = userCache.getUsers(false);
+
     ArrayList<User>usersWithSelectedColumns = new ArrayList<>();
 
     // TODO: Add Encryption to JSON : FIXED
@@ -98,7 +103,7 @@ public class UserEndpoints {
       //SIMON - Krypterer indholdet hvis token ikke findes.
       Boolean check = true;
 
-    for (User user :  users){
+    for (User user :  cashedUsers){
         if (user.getToken()!= null && user.getToken().equals(token)){
             //SIMON - Sætter check til false, så json-strengen ikke bliver krypteret, hvis token findes.
             check = false;
@@ -138,7 +143,7 @@ public class UserEndpoints {
           User createUser = UserController.createUser(newUser);
 
           //SIMON - Opdaterer cachen når der er blevet oprettet en bruger
-          userCache.getUsers(true);
+          cashedUsers = userCache.getUsers(true);
 
 
           // Get the user back with the added ID and return it to the user
@@ -167,7 +172,7 @@ public class UserEndpoints {
 
       String token = UserController.login(userLogin);
 
-      userCache.getUsers(true); //SIMON - Opdaterer Cachen, så vi får token med, da vi verificerer ud fra Cahcen
+      cashedUsers=userCache.getUsers(true); //SIMON - Opdaterer Cachen, så vi får token med, da vi verificerer ud fra Cahcen
 
 
 if (token!=null){
@@ -183,9 +188,9 @@ if (token!=null){
   public Response deleteUser(@PathParam("token") String token) {
 
 
-          ArrayList<User> users = userCache.getUsers(false);
 
-          for (User user : users){
+
+          for (User user : cashedUsers){
               if (user.getToken()!=null && user.getToken().equals(token)){
                   //SIMON - Kalder deleteUser-metoden i UserControlleren, hvor input er det id, der er blevet fundet i dette loop
                   UserController.deleteUser(user.getId());
@@ -208,17 +213,17 @@ if (token!=null){
   @Consumes(MediaType.APPLICATION_JSON)
   public Response updateUser(String UserUpdatedData, @PathParam("token") String token) {
 
-      ArrayList<User> users = userCache.getUsers(false);
+
       // Read the json from body and transfer it to a user class
       User updateUser = new Gson().fromJson(UserUpdatedData, User.class);
 
-        for (User user : users){
+        for (User user : cashedUsers){
             if (user.getToken()!=null && user.getToken().equals(token)){
 
             UserController.updateUser(user, updateUser);
 
             //SIMON - Opdaterer cachen når en bruger har opdateret sine oplysninger
-            userCache.getUsers(true);
+            cashedUsers = userCache.getUsers(true);
             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You have chosen to update user with id " + user.getId() ).build();
 
             }
@@ -233,13 +238,12 @@ if (token!=null){
     @Path("/logout/{token}")
     public Response logout (@PathParam("token") String token){
 
-      ArrayList<User> users = userCache.getUsers(false);
 
-      for (User user : users){
+      for (User user : cashedUsers){
           if (user.getToken()!= null && user.getToken().equals(token)){
               UserController.logout(user);
 
-              userCache.getUsers(true);
+              cashedUsers = userCache.getUsers(true);
 
               return Response.status(200).entity("You are now logget out. See Ya").build();
           }

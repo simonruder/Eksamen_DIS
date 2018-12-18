@@ -37,7 +37,7 @@ public class ReviewEndpoints {
 
       boolean checkForEncryption = true;
     //SIMON - Kalder UserControlleren til at lave en liste over alle brugere fra DB
-    ArrayList<User> users = UserController.getUsers();
+    ArrayList<User> users = UserEndpoints.getCashedUsers();
       // Call our controller-layer in order to get the order from the DB
       ArrayList<Review> reviews = ReviewController.searchByTitle(reviewTitle);
 

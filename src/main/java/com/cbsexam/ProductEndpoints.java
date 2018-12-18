@@ -22,7 +22,7 @@ import utils.Log;
 public class ProductEndpoints {
 
   private static ProductCache productCache = new ProductCache();//SIMON - Vi laver en global instans
-  private static ArrayList<User> users = UserController.getUsers();
+
 
 
   @GET
@@ -42,7 +42,7 @@ public class ProductEndpoints {
   public Response getProduct(@PathParam("idProduct") int idProduct, @PathParam("token") String token) {
 
     try{
-
+        ArrayList<User> users = UserEndpoints.getCashedUsers();
       //SIMON - Vi behøver ikke tjekke for ID, da catchen fanger fejlen, hvis ID er ugyldigt
       // Call our controller-layer in order to get the order from the DB
       Product product = ProductController.getProduct(idProduct);
@@ -83,6 +83,7 @@ public class ProductEndpoints {
   public Response getProducts(@PathParam("token") String token) {
 
     try {
+        ArrayList<User> users = UserEndpoints.getCashedUsers();
       boolean checkForEncryption = true;
 
 

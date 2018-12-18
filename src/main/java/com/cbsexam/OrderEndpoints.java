@@ -21,7 +21,7 @@ import utils.Log;
 @Path("order")
 public class OrderEndpoints {
 
-  private static ArrayList<User> users = UserController.getUsers();
+
   //Laver en global instance af orderCachen
   private static OrderCache orderCache = new OrderCache();
 
@@ -44,6 +44,7 @@ public class OrderEndpoints {
 
     try {
 
+        ArrayList<User> users = UserEndpoints.getCashedUsers();
       //SIMON - vi behøver ikke tjekke for ID, da vi catcher fejlen
 
       // Call our controller-layer in order to get the order from the DB
@@ -84,7 +85,7 @@ public class OrderEndpoints {
   public Response getOrders(@PathParam("token") String token) {
 
     try {
-
+        ArrayList<User> users = UserEndpoints.getCashedUsers();
       boolean checkForEncryption = true;
 
       // Write to log that we are here
