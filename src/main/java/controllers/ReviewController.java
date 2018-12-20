@@ -33,7 +33,7 @@ public class ReviewController {
     return reviews;
   }
 
-
+//SIMON - Denne metode bliver ikke brugt af noget endpoint, men den kunne i fremtiden implementeres.
   public static ArrayList<Review> searchByID(int id) {
 
     // We wish to have an empty list for the results
