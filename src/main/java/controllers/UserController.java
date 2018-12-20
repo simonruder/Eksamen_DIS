@@ -21,6 +21,7 @@ public class UserController {
 
   public static User getUser(int id) {
 
+    //SIMON - Denne metode bliver ikke taget i brug, da jeg bruger cachen i stedet til at få den enkelte bruger.
     // Check for connection
     if (dbCon == null) {
       dbCon = new DatabaseController();

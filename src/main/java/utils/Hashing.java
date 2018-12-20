@@ -9,14 +9,16 @@ public final class Hashing {
 
   private String salt;
 
+  //SIMON - med denne metode sætter jeg salt, som kan være forskellig fra bruger til bruger, da jeg bruger created_at til passwords, og current_time til token
     public void setSalt(String salt) {
         this.salt = salt;
     }
 
-    //TODO: HVilken HASH skal jeg bruge?
 
   // TODO: You should add a salt and make this secure : FIXED
   // TODO: Bruge created_at som SALT :FIXED
+
+  //SIMON - Jeg benytter ikke Md5 i systemet, men gemmer algoritmen, hvis kunden finder Md5 mere anvendelig end SHA256
   public static String md5(String rawString) {
     try {
 
@@ -95,6 +97,7 @@ public final class Hashing {
     return hashWithMd5(md5Salt);
   }
 
+  //SIMON - Denne metode tager en Salt-streng og tilføjer den til passwordet, og derefter hasher den det ved at kalde hashWithSha
   public String shaWithSalt(String str){
 
 
